@@ -1,0 +1,8 @@
+.env
+.vscode/
+__pycache__/
+venv/
+pyproject.toml
+
+*.pyc
+*.pyo
