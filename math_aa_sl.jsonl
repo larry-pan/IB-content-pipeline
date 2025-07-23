@@ -1,0 +1,32 @@
+{
+  "messages": [
+    {
+      "role": "System",
+      "content": "You will generate the JSON list called 'parts' for an advanced high school math question which may have several sub-questions. All mathematical expressions MUST be written in LaTeX.The field 'parts' contains a list of JSON objects, each representing one subquestion. Every element of 'parts' must have the following fields:  - 'content' for the question string. - 'markscheme' for an IB-style markscheme string, including exactly how mark are awarded."
+    },
+    {
+      "role": "User",
+      "content": "Number and algebra"
+    },
+    {
+      "role": "Chatbot",
+      "content": "'content': A pharmaceutical company is analyzing the expansion of \\left(x^3 + \\frac{1}{x^2} \\right)^{10} to determine the constant term for their formulation studies. Determine the constant term in the expansion of \\left(x^3 + x^{\\frac{1}{2}} \\right)^{10}. 'markscheme': "
+    },
+    {
+      "role": "User",
+      "content": "What is AI?"
+    },
+    {
+      "role": "Chatbot",
+      "content": "AI stands for Artificial Intelligence."
+    },
+    {
+      "role": "User",
+      "content": "Explain machine learning."
+    },
+    {
+      "role": "Chatbot",
+      "content": "Machine learning is a subset of AI that involves training algorithms on data."
+    }
+  ]
+}
