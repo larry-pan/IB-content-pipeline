@@ -2,104 +2,130 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Loader2, BookOpen, FileQuestion, Settings } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
-interface GeneratedQuestion {
+interface QuestionPart {
   content: string;
-  subject: string;
-  parts: string;
-  type: string;
+  markscheme: string;
+  order: number;
+  marks?: number;
+  subtopics?: string[];
+}
+
+interface Option {
+  content: string;
+  correct: boolean;
+  markscheme: string;
+  order: number;
+  subtopics?: string[];
+}
+
+interface GeneratedQuestion {
+  id: string;
+  parts: QuestionPart[];
+  options: Option[];
 }
 
 const QuestionGenerator = () => {
   const [subject, setSubject] = useState("");
-  const [parts, setParts] = useState("");
-  const [questionType, setQuestionType] = useState("");
+  const [topic, setTopic] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [generatedQuestion, setGeneratedQuestion] = useState<GeneratedQuestion | null>(null);
+  const [generatedQuestion, setGeneratedQuestion] =
+    useState<GeneratedQuestion | null>(null);
   const { toast } = useToast();
 
-  const subjects = [
-    "Mathematics",
-    "Physics", 
-    "Chemistry",
-    "Biology",
-    "History",
-    "Geography",
-    "Economics",
-    "English Literature",
-    "Psychology",
-    "Computer Science"
-  ];
+  const subjects = ["Mathematics", "Computer Science"];
 
   const partOptions = [
     { value: "single", label: "Single Question" },
     { value: "part-ab", label: "Part A + B" },
     { value: "part-abc", label: "Part A + B + C" },
-    { value: "part-abcd", label: "Part A + B + C + D" }
+    { value: "part-abcd", label: "Part A + B + C + D" },
   ];
 
-  const questionTypes = [
-    "Multiple Choice",
-    "Essay Question",
-    "Problem Solving",
-    "Data Analysis",
-    "Case Study",
-    "Research Question",
-    "Practical Investigation"
-  ];
-
-//   useEffect(() => {
-//     const generateEmpty = async () => {
-//       try {
-//         const response = await axios.post("http://localhost:8000/generate", {});
-//         console.log("Generated question:", response.data);
-//       } catch (error) {
-//         console.error("Error generating question:", error);
-//       }
-//     };
-
-//   generateEmpty();
-// }, []);
+  const questionTypes =
+    subject === "Mathematics"
+      ? [
+          "Number and Algebra",
+          "Functions",
+          "Geometry and Trigonometry",
+          "Statistics and Probability",
+          "Calculus",
+        ]
+      : subject === "Computer Science"
+      ? ["Not yet"]
+      : ["Please select a subject first"];
 
   const handleGenerate = async () => {
-    if (!subject || !parts || !questionType) {
+    if (!subject || !topic) {
       toast({
         title: "Missing Information",
         description: "Please select all options before generating a question.",
-        variant: "destructive"
+        variant: "destructive",
       });
       return;
     }
 
     setIsLoading(true);
-    
+
     try {
-      // Simulate API call for demo purposes
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
-      // Mock response - in real app this would be the actual API call
-      const mockQuestion: GeneratedQuestion = {
-        content: `Here is a sample IB ${subject} question with ${parts.replace('-', ' ')} structure as a ${questionType}:\n\nThis would be the generated question content based on your specifications. The actual implementation would make a POST request to your AI service with the selected parameters.`,
-        subject,
-        parts,
-        type: questionType
+      const response = await axios.post(
+        "http://127.0.0.1:8000/generate",
+        {
+          subject: subject,
+          topic: topic,
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      // Extract the generated question from response
+      const generatedQuestion: GeneratedQuestion = {
+        id: response.data.id,
+        parts: response.data.parts,
+        options: response.data.options,
       };
-      
-      setGeneratedQuestion(mockQuestion);
-      
+
+      setGeneratedQuestion(generatedQuestion);
+
       toast({
         title: "Question Generated!",
-        description: "Your IB question has been successfully created."
+        description: "Your IB question has been successfully created.",
       });
-      
     } catch (error) {
+      console.error("API Error:", error);
+
+      let errorMessage =
+        "There was an error generating your question. Please try again.";
+
+      if (axios.isAxiosError(error)) {
+        if (error.code === "ECONNABORTED") {
+          errorMessage = "Request timed out. Please try again.";
+        } else if (error.response?.status === 400) {
+          errorMessage =
+            "Invalid request parameters. Please check your selections.";
+        } else if (error.response?.status === 500) {
+          errorMessage = "Server error. Please try again later.";
+        } else if (error.response?.data?.message) {
+          errorMessage = error.response.data.message;
+        }
+      }
+
       toast({
         title: "Generation Failed",
-        description: "There was an error generating your question. Please try again.",
-        variant: "destructive"
+        description: errorMessage,
+        variant: "destructive",
       });
     } finally {
       setIsLoading(false);
@@ -132,10 +158,12 @@ const QuestionGenerator = () => {
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {/* Subject Selection */}
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-foreground">Subject</label>
+                  <label className="text-sm font-medium text-foreground">
+                    Subject
+                  </label>
                   <Select value={subject} onValueChange={setSubject}>
                     <SelectTrigger className="bg-background/50">
                       <SelectValue placeholder="Select subject" />
@@ -150,27 +178,12 @@ const QuestionGenerator = () => {
                   </Select>
                 </div>
 
-                {/* Parts Selection */}
+                {/* Topic Selection */}
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-foreground">Question Parts</label>
-                  <Select value={parts} onValueChange={setParts}>
-                    <SelectTrigger className="bg-background/50">
-                      <SelectValue placeholder="Select parts" />
-                    </SelectTrigger>
-                    <SelectContent className="bg-popover border shadow-medium">
-                      {partOptions.map((option) => (
-                        <SelectItem key={option.value} value={option.value}>
-                          {option.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                {/* Question Type Selection */}
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-foreground">Question Type</label>
-                  <Select value={questionType} onValueChange={setQuestionType}>
+                  <label className="text-sm font-medium text-foreground">
+                    Topic
+                  </label>
+                  <Select value={topic} onValueChange={setTopic}>
                     <SelectTrigger className="bg-background/50">
                       <SelectValue placeholder="Select type" />
                     </SelectTrigger>
@@ -187,7 +200,7 @@ const QuestionGenerator = () => {
 
               {/* Generate Button */}
               <div className="flex justify-center pt-4">
-                <Button 
+                <Button
                   onClick={handleGenerate}
                   disabled={isLoading}
                   className="bg-gradient-primary hover:opacity-90 px-8 py-6 text-lg font-semibold shadow-medium"
@@ -218,20 +231,44 @@ const QuestionGenerator = () => {
                 </CardTitle>
                 <div className="flex flex-wrap gap-2">
                   <span className="px-3 py-1 bg-primary/10 text-primary rounded-full text-sm">
-                    {generatedQuestion.subject}
+                    {generatedQuestion.id}
                   </span>
-                  <span className="px-3 py-1 bg-accent/10 text-accent rounded-full text-sm">
-                    {partOptions.find(p => p.value === generatedQuestion.parts)?.label}
-                  </span>
+
                   <span className="px-3 py-1 bg-secondary text-secondary-foreground rounded-full text-sm">
-                    {generatedQuestion.type}
+                    <div className="space-y-2">
+                      {generatedQuestion.parts.map((part, idx) => (
+                        <div
+                          key={idx}
+                          className="px-3 py-2 bg-secondary text-secondary-foreground rounded-lg text-sm"
+                        >
+                          <p>
+                            <strong>Content:</strong> {part.content}
+                          </p>
+                          <p>
+                            <strong>Marks:</strong> {part.marks}
+                          </p>
+                          <p>
+                            <strong>Markscheme:</strong> {part.markscheme}
+                          </p>
+                          <p>
+                            <strong>Subtopics:</strong>{" "}
+                            {part.subtopics.join(", ")}
+                          </p>
+                          <p>
+                            <strong>Order:</strong> {part.order}
+                          </p>
+                        </div>
+                      ))}
+                    </div>
                   </span>
                 </div>
               </CardHeader>
               <CardContent>
                 <div className="bg-muted/30 rounded-lg p-6 border border-border/50">
                   <pre className="whitespace-pre-wrap text-foreground leading-relaxed">
-                    {generatedQuestion.content}
+                    {generatedQuestion.options
+                      .map((part, idx) => part.content)
+                      .join(", ")}
                   </pre>
                 </div>
               </CardContent>

@@ -3,6 +3,8 @@
 __pycache__/
 venv/
 pyproject.toml
+node_modules/
+dist/
 .*
 
 *.pyc
