@@ -70,7 +70,3 @@ class AAMathGenerator:
         print("Markscheme finalized")
 
         return question
-
-
-generator = AAMathGenerator()
-print(generator.generate())

@@ -1,4 +1,12 @@
+from fastapi import FastAPI
 import generator
 
+app = FastAPI()
+
 aa_generator = generator.AAMathGenerator()
-print(aa_generator.generate())
+
+
+@app.post("/generate")
+def generate_question():
+    
+    return {"question": aa_generator.generate()}
