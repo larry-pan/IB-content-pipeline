@@ -20,7 +20,7 @@ print(result)
 print("------------")
 create_response = co.finetuning.create_finetuned_model(
     request=FinetunedModel(
-        name="test-finetune-model",
+        name="math-aa-generator-v1",
         settings=Settings(
             base_model=BaseModel(
                 base_type="BASE_TYPE_CHAT",

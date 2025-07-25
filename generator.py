@@ -2,22 +2,60 @@ import cohere
 from dotenv import dotenv_values
 import json
 
+math_aa_generator_v1 = "d9276017-6281-446d-bfab-f8158a6c4969-ft"
+
 
 class AAMathGenerator:
     def __init__(self):
         config = dotenv_values(".env")
         self.co = cohere.ClientV2(config.get("COHERE_KEY"))
-        self.model_id = "command-a-03-2025"
+        self.base_model_id = "command-a-03-2025"
+        self.model_id = math_aa_generator_v1
 
-    def generate_question(self, topic="Number and algebra"):
+    def generate_question(self, topic="Number and Algebra"):
         response = self.co.chat(
             model=self.model_id,
             messages=[
                 {
                     "role": "system",
-                    "content": "You will generate the JSON list called 'parts' for an advanced high school math question which may have several sub-questions. All mathematical expressions MUST be written in LaTeX.The field 'parts' contains a list of JSON objects, each representing one subquestion. Every element of 'parts' must have the following fields:  - 'content' for the question string with equations and numbers in latex. - 'marks' for how many marks the question is worth, with more marks for harder questions. - 'markscheme' for an IB-style markscheme string which focuses as much as possible on concise numerical steps with almost no word descriptions, showing the major computational steps in latex to solve the problem while including exactly how mark are awarded. - 'subtopics' for a list of IB subtopics that the question covers, which may overlap into other topics.",
+                    "content": """
+                    You will generate a JSON called for a university level IB-style math question.
+                    Strictly follow this format:
+                    {
+                        "content": string,
+                        "marks": integer,
+                        "markscheme": string,
+                        "subtopics": array of strings
+                    }
+                    All mathematical expressions MUST be written in LaTeX.
+
+                    Output must have the following fields:
+                    - 'content' for the question string with equations and numbers in LaTeX.
+                    - 'marks' for how many marks the question is worth, with more marks for harder questions.
+                    - 'markscheme' for an IB-style markscheme string which focuses as much as possible on concise numerical steps with almost no word descriptions, showing the major computational steps in LaTeX to solve the problem while including exactly how marks are awarded.
+                    - 'subtopics' for a list of IB subtopics that the question covers, which may overlap into other topics.
+                    """,
                 },
                 {"role": "user", "content": topic},
+            ],
+            # response format is not supported for fine-tuned models, so we will enforce json with fix_json
+        )
+        return topic, response.message.content[0].text
+
+    def fix_json(self, str, topic=None):
+        response = self.co.chat(
+            model=self.base_model_id,
+            messages=[
+                {
+                    "role": "system",
+                    "content": """
+                    You convert the following response into a JSON with fields 'content', 'marks', 'markscheme', and 'subtopics'. 
+                    Fix all formatting errors, including:
+
+                    DO NOT CHANGE any of the content of the fields.
+                    """,
+                },
+                {"role": "user", "content": str},
             ],
             response_format={
                 "type": "json_object",
@@ -33,9 +71,9 @@ class AAMathGenerator:
                 },
             },
         )
-
         response_json = json.loads(response.message.content[0].text)
-        response_json["topic"] = topic
+        if topic:
+            response_json["topic"] = topic
         return response_json
 
     def judge_question(self, question):
@@ -47,15 +85,26 @@ class AAMathGenerator:
         }
 
         response = self.co.chat(
-            model=self.model_id,
+            model=self.base_model_id,
             messages=[
                 {
                     "role": "system",
-                    "content": "You are a judge for IB math questions. You must output JSON with the new 'content' and 'subtopics' if they can be improved and an integer 'score' from 0-100. This is based on the following factors:\n"
-                    "- The content has no LaTex errors.\n"
-                    "- The question covers the specified topic and subtopics, without missing any or including concepts outside the topics.\n"
-                    "- The question make sense and is solvable\n"
-                    "DO NOT add anything to the fields that does not explicitly fix a problem.",
+                    "content": """
+                    You are a judge for IB math questions. 
+                    You must output a JSON with the new 'content' and 'subtopics' if they can be improved and an integer 'score' from 0-100. 
+                    Strictly follow this format:
+                    {
+                        "content": string,
+                        "marks": integer,
+                        "subtopics": array of strings,
+                        "score": integer
+                    }
+                    This is based on the following factors:
+                    - The content has no LaTeX errors.
+                    - The question covers the specified topic and subtopics, without missing any or including concepts outside the topics.
+                    - The question make sense and is solvable
+                    DO NOT add anything to the fields that does not explicitly fix a problem.
+                    """,
                 },
                 {"role": "user", "content": str(inputs)},
             ],
@@ -72,6 +121,7 @@ class AAMathGenerator:
                 },
             },
         )
+        print(response.message.content[0].text)
         return json.loads(response.message.content[0].text)
 
     def judge_markscheme(self, question):
@@ -82,16 +132,29 @@ class AAMathGenerator:
         }
 
         response = self.co.chat(
-            model=self.model_id,
+            model=self.base_model_id,
             messages=[
                 {
                     "role": "system",
-                    "content": "You are a judge for IB math markschemes. You must output JSON with the new 'content', 'marks', and 'markscheme' if they can be improved and an integer 'score' from 0-100 indicating how well the original quetion conforms to the guidelines. This is based on the following factors:\n"
-                    "- The markscheme has no mathematical errors and answers the question correctly.\n"
-                    "- The markscheme is as concise as possible, with no very limited and only strictly needed explaination.\n"
-                    "- The markscheme focuses as much as possible on numerical steps, with almost no word descriptions.\n"
-                    "- The markscheme clearly distributes the correct number of marks to the correct steps.\n"
-                    "DO NOT add anything to the fields that does not explicitly fix a problem.",
+                    "content": """
+                    You are a judge for IB math markschemes. 
+                    You must output a JSON with the new 'content', 'marks', 
+                    and 'markscheme' if they can be improved and an integer 'score' from 0-100 
+                    indicating how well the original question conforms to the guidelines. 
+                    Strictly follow this format:
+                    {
+                        "content": string,
+                        "marks": integer,
+                        "markscheme": string,
+                        "score": integer
+                    }
+
+                    This is based on the following factors:
+                    - The markscheme has no mathematical errors and answers the question correctly.
+                    - The markscheme is as concise as possible, with very limited and only strictly needed explanation.
+                    - The markscheme focuses as much as possible on numerical steps, with almost no word descriptions.
+                    - The markscheme clearly distributes the correct number of marks to the correct steps by marking a step with [M1], [M2], etc.
+                    DO NOT add anything to the fields that does not explicitly fix a problem.""",
                 },
                 {"role": "user", "content": str(inputs)},
             ],
@@ -109,6 +172,7 @@ class AAMathGenerator:
                 },
             },
         )
+        print(response.message.content[0].text)
         return json.loads(response.message.content[0].text)
 
     def combine_json(self, master, new):
@@ -120,8 +184,8 @@ class AAMathGenerator:
         return {key: new.get(key, master[key]) for key in master}
 
     def generate(self, topic="Number and algebra", max_iterations=3, acceptable_score=95):
-        question = self.generate_question(topic)
-        final = question
+        question_str = self.generate_question(topic)
+        question = self.fix_json(question_str, topic)
 
         for i in range(max_iterations):
             judged_question = self.judge_question(question)
@@ -132,12 +196,12 @@ class AAMathGenerator:
 
         for i in range(max_iterations):
             judged_markscheme = self.judge_markscheme(question)
-            final = self.combine_json(question, judged_markscheme)
+            question = self.combine_json(question, judged_markscheme)
 
             if judged_markscheme["score"] >= acceptable_score:
                 break
 
-        return final
+        return question
 
 
 generator = AAMathGenerator()
