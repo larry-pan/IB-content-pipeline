@@ -104,7 +104,7 @@ const QuestionGenerator = () => {
             </h1>
           </div>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            Generate customized International Baccalaureate questions with AI-powered precision
+            Math AA + CS Demo
           </p>
         </div>
 
