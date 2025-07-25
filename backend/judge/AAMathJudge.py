@@ -36,6 +36,7 @@ class AAMathJudge:
                         This is based on the following guidelines:
                         - The contents has no LaTeX errors.
                         - The questions covers the specified topic and subtopics, without missing any or including concepts outside the topics.
+                        - The questions are readable in string format.
                         - The questions make sense and is solvable
                         DO NOT add anything to the fields that does not explicitly fix a problem.
                         """,
@@ -110,9 +111,11 @@ class AAMathJudge:
 
                     This is based on the following factors:
                     - The markscheme has no mathematical errors and answers the question correctly.
+                    - The markscheme has all numbers and equations in LaTeX.
                     - The markscheme is as concise as possible, with very limited and only strictly needed explanation.
                     - The markscheme focuses as much as possible on numerical steps, with almost no word descriptions.
-                    - The markscheme clearly distributes the correct number of marks to the correct steps by marking a step with [M1], [M2], etc.
+                    - The markscheme clearly distributes the correct number of marks to the correct steps.
+                    A step worth 1 mark should be marked [M1], a step worth 2 marks is [M2], all the Ms should strictly add up to 'marks'.
                     DO NOT add anything to the fields that does not explicitly fix a problem.""",
                 },
                 {"role": "user", "content": str(question)},

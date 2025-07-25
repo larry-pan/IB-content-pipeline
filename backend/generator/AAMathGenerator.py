@@ -57,6 +57,8 @@ class AAMathGenerator:
                     - 'order': an integer indicating the order of the question in the topic, counting up from 1
 
                     Make sure all questions and answers are rigorous and well-aligned with the IB Math syllabus.
+                    Make a large variety of questions. If the question has mutliple parts, incorporate different subjects and topics.
+                    Some variations include: integration, sequences, limits, proofs, probabilities, etc.
                     """,
                 },
                 {"role": "user", "content": topic},

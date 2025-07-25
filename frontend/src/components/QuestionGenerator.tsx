@@ -74,6 +74,7 @@ const QuestionGenerator = () => {
       return;
     }
 
+    setGeneratedQuestion(null);
     setIsLoading(true);
 
     try {
@@ -133,7 +134,7 @@ const QuestionGenerator = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-subtle">
+    <div className="min-h-screen bg-gradient-subtle pt-16">
       <div className="container mx-auto px-4 py-8">
         {/* Header */}
         <div className="text-center mb-12">
@@ -234,12 +235,12 @@ const QuestionGenerator = () => {
                     {generatedQuestion.id}
                   </span>
 
-                  <span className="px-3 py-1 bg-secondary text-secondary-foreground rounded-full text-sm">
+                  <span className="px-3 py-1 bg-secondary text-secondary-foreground text-sm">
                     <div className="space-y-2">
                       {generatedQuestion.parts.map((part, idx) => (
                         <div
                           key={idx}
-                          className="px-3 py-2 bg-secondary text-secondary-foreground rounded-lg text-sm"
+                          className="px-3 py-2 bg-secondary text-secondary-foreground text-sm"
                         >
                           <p>
                             <strong>Content:</strong> {part.content}
