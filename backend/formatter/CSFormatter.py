@@ -1,8 +1,7 @@
 import json
-import uuid
 
 
-class Formatter:
+class CSFormatter:
 
     def __init__(self, co, model_id):
         self.co = co
@@ -17,7 +16,7 @@ class Formatter:
                     "content": """
                         You convert the following response into a JSON with string 'topic' and list 'parts', as strictly defined here: 
                         {
-                            "topic": string,
+                            "question": string,
                             "parts": [
                                 {
                                     "content": string,
@@ -40,7 +39,7 @@ class Formatter:
                 "schema": {
                     "type": "object",
                     "properties": {
-                        "topic": {"type": "string"},
+                        "question": {"type": "string"},
                         "parts": {
                             "type": "array",
                             "items": {
@@ -62,7 +61,7 @@ class Formatter:
                             },
                         },
                     },
-                    "required": ["topic", "parts"],
+                    "required": ["question", "parts"],
                 },
             },
         )
@@ -70,20 +69,3 @@ class Formatter:
         if topic:
             response_json["topic"] = topic
         return response_json
-
-    def finalize_json(self, question_json):
-        question_json["id"] = str(uuid.uuid4())
-        if "parts" not in question_json:
-            question_json["parts"] = []
-        if "options" not in question_json:
-            question_json["options"] = []
-
-        return question_json
-
-    def combine_json(self, master, new):
-        """
-        Updates the master dictionary with values from new,
-        but only for keys that already exist in master.
-        Extra keys in new are ignored.
-        """
-        return {key: new.get(key, master[key]) for key in master}

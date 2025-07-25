@@ -1,4 +1,4 @@
 import generator
 
-aa_generator = generator.AAMathGenerator()
-print(aa_generator.generate())
+g = generator.CSGenerator()
+print(g.generate())

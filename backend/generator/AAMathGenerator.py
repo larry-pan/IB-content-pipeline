@@ -14,7 +14,7 @@ class AAMathGenerator:
         self.co = cohere.ClientV2(config.get("COHERE_KEY"), log_warning_experimental_features=False)
         self.KEY_LIMIT = 10
 
-        self.formatter = formatter.Formatter(self.co, self.base_model_id)
+        self.formatter = formatter.MathAAFormatter(self.co, self.base_model_id)
         self.judge = judge.AAMathJudge(self.co, self.base_model_id)
 
     def generate_question(self, topic="Number and Algebra"):

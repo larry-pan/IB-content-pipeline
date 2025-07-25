@@ -13,11 +13,12 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-aa_generator = generator.AAMathGenerator()
-
 
 @app.post("/generate")
 def generate_question(req: GenerateRequest):
+    aa_generator = generator.AAMathGenerator()
+
     print(req.topic)
     question = aa_generator.generate(topic=req.topic)
+    print(question)
     return JSONResponse(question)
