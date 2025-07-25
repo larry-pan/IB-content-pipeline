@@ -1,2 +1,2 @@
-from .AAMathGenerator import AAMathGenerator
+from .MathAAGenerator import MathAAGenerator
 from .CSGenerator import CSGenerator

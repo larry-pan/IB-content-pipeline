@@ -16,7 +16,7 @@ app.add_middleware(
 
 @app.post("/generate")
 def generate_question(req: GenerateRequest):
-    aa_generator = generator.AAMathGenerator()
+    aa_generator = generator.MathAAGenerator()
 
     print(req.topic)
     question = aa_generator.generate(topic=req.topic)

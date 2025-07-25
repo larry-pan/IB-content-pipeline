@@ -66,12 +66,13 @@ class CSGenerator:
             ],
             # response format is not supported for fine-tuned models, so we will enforce json with fix_json
         )
-        return topic, response.message.content[0].text
+        print(response)
+        return response.message.content[0].text
 
     def generate(
         self, topic="Problem-solving and Programming", max_iterations=2, acceptable_score=95
     ):
-
+        print("Generating")
         question_str = self.generate_question(topic)
         print("Formatting")
         question = self.Formatter.fix_json(question_str, topic)

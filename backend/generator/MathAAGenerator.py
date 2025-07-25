@@ -4,13 +4,14 @@ import formatter
 import judge
 
 
-class AAMathGenerator:
+class MathAAGenerator:
     def __init__(self):
         math_aa_generator_v2 = "e89238d1-6894-48a0-944c-011fd837df78-ft"
         self.model_id = math_aa_generator_v2
         self.base_model_id = "command-a-03-2025"
 
         config = dotenv_values(".env")
+        print(config)
         self.co = cohere.ClientV2(config.get("COHERE_KEY"), log_warning_experimental_features=False)
         self.KEY_LIMIT = 10
 
@@ -65,7 +66,7 @@ class AAMathGenerator:
             ],
             # response format is not supported for fine-tuned models, so we will enforce json with fix_json
         )
-        return topic, response.message.content[0].text
+        return response.message.content[0].text
 
     def generate(self, topic="Calculus", max_iterations=2, acceptable_score=95):
 

@@ -1,7 +1,8 @@
 import json
+from .BaseFormatter import BaseFormatter
 
 
-class CSFormatter:
+class CSFormatter(BaseFormatter):
 
     def __init__(self, co, model_id):
         self.co = co
