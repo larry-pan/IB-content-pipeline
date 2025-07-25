@@ -65,7 +65,7 @@ class AAMathGenerator:
         )
         return topic, response.message.content[0].text
 
-    def generate(self, topic="Number and algebra", max_iterations=2, acceptable_score=95):
+    def generate(self, topic="Calculus", max_iterations=2, acceptable_score=95):
 
         question_str = self.generate_question(topic)
         question = self.formatter.fix_json(question_str, topic)
@@ -93,4 +93,4 @@ class AAMathGenerator:
 
         print("Markscheme finalized")
 
-        return question
+        return self.formatter.finalize_json(question)
