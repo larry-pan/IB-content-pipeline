@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import axios from "axios";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -49,6 +50,19 @@ const QuestionGenerator = () => {
     "Research Question",
     "Practical Investigation"
   ];
+
+//   useEffect(() => {
+//     const generateEmpty = async () => {
+//       try {
+//         const response = await axios.post("http://localhost:8000/generate", {});
+//         console.log("Generated question:", response.data);
+//       } catch (error) {
+//         console.error("Error generating question:", error);
+//       }
+//     };
+
+//   generateEmpty();
+// }, []);
 
   const handleGenerate = async () => {
     if (!subject || !parts || !questionType) {
@@ -186,7 +200,7 @@ const QuestionGenerator = () => {
                   ) : (
                     <>
                       <FileQuestion className="mr-2 h-5 w-5" />
-                      Generate IB Question
+                      Generate
                     </>
                   )}
                 </Button>

@@ -6,8 +6,8 @@ import judge
 
 class AAMathGenerator:
     def __init__(self):
-        math_aa_generator_v1 = "d9276017-6281-446d-bfab-f8158a6c4969-ft"
-        self.model_id = math_aa_generator_v1
+        math_aa_generator_v2 = "e89238d1-6894-48a0-944c-011fd837df78-ft"
+        self.model_id = math_aa_generator_v2
         self.base_model_id = "command-a-03-2025"
 
         config = dotenv_values(".env")
@@ -24,21 +24,39 @@ class AAMathGenerator:
                 {
                     "role": "system",
                     "content": """
-                    You will generate a JSON called for a university level IB-style math question.
+                    
+                    You are an assistant that generates IB-style advanced high school and early university math questions and markschemes. 
+                    All mathematical expressions MUST be written in valid LaTeX format. 
+
+                    You will generate a JSON object with a field 'topic' and a list called 'parts', where each element is a sub-question. 
                     Strictly follow this format:
                     {
-                        "content": string,
-                        "marks": integer,
-                        "markscheme": string,
-                        "subtopics": array of strings
+                        "topic": string,
+                        "parts": [
+                            {
+                                "content": string,
+                                "marks": int,
+                                "markscheme": string,
+                                "subtopics": list of strings,
+                                "order": int
+                            },
+                            ...
+                        ]
                     }
-                    All mathematical expressions MUST be written in LaTeX.
+                    The whole object must have:
+                    - 'topic': the subtopic of the question within the user's requested topic.
+                    - 'parts': a list of sub-questions, where each sub-question is a JSON object.
 
-                    Output must have the following fields:
-                    - 'content' for the question string with equations and numbers in LaTeX.
-                    - 'marks' for how many marks the question is worth, with more marks for harder questions.
-                    - 'markscheme' for an IB-style markscheme string which focuses as much as possible on concise numerical steps with almost no word descriptions, showing the major computational steps in LaTeX to solve the problem while including exactly how marks are awarded.
-                    - 'subtopics' for a list of IB subtopics that the question covers, which may overlap into other topics.
+                    Each sub-question must have:
+                    - 'content': a clear and challenging question string with equations and numbers in LaTeX.
+                    - 'marks': how many marks the question is worth, with more marks for harder questions.
+                    - 'markscheme': an IB-style markscheme string which focuses as much as possible on concise numerical steps
+                                    with almost no word descriptions, showing the major computational steps in LaTeX to solve the 
+                                    problem while including exactly how marks are awarded.
+                    - 'subtopics': a list of IB subtopics that the question covers, which may overlap into other topics.
+                    - 'order': an integer indicating the order of the question in the topic, counting up from 1
+
+                    Make sure all questions and answers are rigorous and well-aligned with the IB Math syllabus.
                     """,
                 },
                 {"role": "user", "content": topic},
@@ -47,26 +65,32 @@ class AAMathGenerator:
         )
         return topic, response.message.content[0].text
 
-    def generate(self, topic="Number and algebra", max_iterations=3, acceptable_score=95):
+    def generate(self, topic="Number and algebra", max_iterations=2, acceptable_score=95):
 
         question_str = self.generate_question(topic)
         question = self.formatter.fix_json(question_str, topic)
         print(f"Initial '{topic}' question generated")
+        print("------------")
+        print(question)
+        print("------------\n\n\n")
 
         for _ in range(max_iterations):
-            judged_question = self.judge.judge_question(question)
-            question = self.formatter.combine_json(question, judged_question)
+            question, score = self.judge.judge_question(question)
 
-            if judged_question["score"] >= acceptable_score:
+            if score >= acceptable_score:
                 break
+
         print("Question finalized")
+        print("------------")
+        print(question)
+        print("------------\n\n\n")
 
         for _ in range(max_iterations):
-            judged_markscheme = self.judge.judge_markscheme(question)
-            question = self.formatter.combine_json(question, judged_markscheme)
+            question, score = self.judge.judge_markscheme(question)
 
-            if judged_markscheme["score"] >= acceptable_score:
+            if score >= acceptable_score:
                 break
+
         print("Markscheme finalized")
 
         return question
