@@ -5,6 +5,8 @@ venv/
 pyproject.toml
 node_modules/
 dist/
+build/
+static/
 .*
 
 *.pyc

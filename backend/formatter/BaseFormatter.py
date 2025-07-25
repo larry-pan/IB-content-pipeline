@@ -9,10 +9,6 @@ class BaseFormatter:
 
     def finalize_json(self, question_json):
         question_json["id"] = str(uuid.uuid4())
-        if "parts" not in question_json:
-            question_json["parts"] = []
-        if "options" not in question_json:
-            question_json["options"] = []
 
         return question_json
 

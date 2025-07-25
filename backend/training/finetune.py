@@ -18,9 +18,10 @@ chat_dataset = co.datasets.create(
     type="chat-finetune-input",
 )
 result = co.wait(chat_dataset)
-print(result)
 
+print(result)
 print("------------")
+
 create_response = co.finetuning.create_finetuned_model(
     request=FinetunedModel(
         name=MODEL_NAME,
@@ -33,3 +34,4 @@ create_response = co.finetuning.create_finetuned_model(
     ),
 )
 print(create_response)
+print("FINETUNING COMPLETED")

@@ -1,7 +1,11 @@
 from pydantic import BaseModel
 
 
-class GenerateRequest(BaseModel):
+class GenerateMathRequest(BaseModel):
     topic: str = "Calculus"
-    max_iterations: int = 3
-    acceptable_score: int = 95
+    level: str = "SL"
+
+
+class GenerateCSRequest(BaseModel):
+    topic: str = "Problem-solving and Programming"
+    level: str = "SL"

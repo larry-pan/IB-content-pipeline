@@ -15,7 +15,9 @@ class CSFormatter(BaseFormatter):
                 {
                     "role": "system",
                     "content": """
-                        You convert the following response into a JSON with string 'topic' and list 'parts', as strictly defined here: 
+                        You convert the following response into a JSON with string 'topic' and list 'parts'.
+                        If one of the two is not present, just leave the non-existant one as an empty array.
+                        Format as strictly defined here: 
                         {
                             "question": string,
                             "parts": [
@@ -27,7 +29,7 @@ class CSFormatter(BaseFormatter):
                                     "order": int
                                 },
                                 ...
-                            ]
+                            ],
                         }
                         Fix all formatting errors.
                         DO NOT CHANGE any of the content of the fields.

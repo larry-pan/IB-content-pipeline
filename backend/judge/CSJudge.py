@@ -80,8 +80,6 @@ class CSJudge:
         )
         json_obj = json.loads(response.message.content[0].text)
         score = json_obj["score"]
-        print("SCORE")
-        print(json_obj["score"])
         json_obj.pop("score", None)
         return json_obj, score
 
@@ -116,7 +114,7 @@ class CSJudge:
 
                     This is based on the following factors:
                     - The markscheme has no errors and answers the question correctly.
-                    - For coding problems, the markscheme is written with pseudocode.
+                    - For coding problems, the markscheme is written in pseudocode.
                     - The markscheme is as concise as possible, with very limited and only strictly needed explanation.
                     - The markscheme focuses as much as possible on short concrete requirements.
                     - The markscheme clearly distributes the correct number of marks to the correct steps.
@@ -160,7 +158,5 @@ class CSJudge:
         )
         json_obj = json.loads(response.message.content[0].text)
         score = json_obj["score"]
-        print("SCORE")
-        print(json_obj["score"])
         json_obj.pop("score", None)
         return json_obj, score

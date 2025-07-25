@@ -11,7 +11,6 @@ class MathAAGenerator:
         self.base_model_id = "command-a-03-2025"
 
         config = dotenv_values(".env")
-        print(config)
         self.co = cohere.ClientV2(config.get("COHERE_KEY"), log_warning_experimental_features=False)
         self.KEY_LIMIT = 10
 
@@ -68,32 +67,24 @@ class MathAAGenerator:
         )
         return response.message.content[0].text
 
-    def generate(self, topic="Calculus", max_iterations=2, acceptable_score=95):
-
+    def generate(self, topic="Calculus", level="SL", max_iterations=2, acceptable_score=95):
+        print("Generating...")
         question_str = self.generate_question(topic)
         question = self.formatter.fix_json(question_str, topic)
-        print(f"Initial '{topic}' question generated")
-        print("------------")
-        print(question)
-        print("------------\n\n\n")
 
+        print(f"Judging question...")
         for _ in range(max_iterations):
             question, score = self.judge.judge_question(question)
 
             if score >= acceptable_score:
                 break
 
-        print("Question finalized")
-        print("------------")
-        print(question)
-        print("------------\n\n\n")
-
+        print(f"Judging markscheme...")
         for _ in range(max_iterations):
             question, score = self.judge.judge_markscheme(question)
 
             if score >= acceptable_score:
                 break
 
-        print("Markscheme finalized")
-
+        print("Question finalized")
         return self.formatter.finalize_json(question)

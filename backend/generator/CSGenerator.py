@@ -1,9 +1,5 @@
 import cohere
 from dotenv import dotenv_values
-import os
-import sys
-
-# sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 import formatter
 import judge
 
@@ -31,7 +27,7 @@ class CSGenerator:
                      You must output a JSON as follows:
                       {
                         "question": string,
-                        "options": [
+                        "parts": [
                             {
                                 "content": string,
                                 "marks": int,
@@ -53,7 +49,7 @@ class CSGenerator:
 
                       Each subquestion may test different topics than the main topic, so combine different topics.
                       All coding questions should be in pseudocode.
-                      You will generate a JSON object containing the string 'question' and the list called 'options', where each element is a subquestion. Each sub-question must have:
+                      You will generate a JSON object containing the string 'question' and the list called 'parts', where each element is a subquestion. Each sub-question must have:
                         - 'question': General info that introduces the subquestions.
                         - 'content': a clear and challenging question string that tests of one or more
                         - 'marks': how many marks the question is worth, with more marks for questions requiring deeper analysis or discussion.
@@ -66,11 +62,14 @@ class CSGenerator:
             ],
             # response format is not supported for fine-tuned models, so we will enforce json with fix_json
         )
-        print(response)
         return response.message.content[0].text
 
     def generate(
-        self, topic="Problem-solving and Programming", max_iterations=2, acceptable_score=95
+        self,
+        topic="Problem-solving and Programming",
+        level="SL",
+        max_iterations=2,
+        acceptable_score=95,
     ):
         print("Generating...")
         question_str = self.generate_question(topic)

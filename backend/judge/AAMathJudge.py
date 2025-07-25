@@ -77,8 +77,6 @@ class AAMathJudge:
         )
         json_obj = json.loads(response.message.content[0].text)
         score = json_obj["score"]
-        print("SCORE")
-        print(json_obj["score"])
         json_obj.pop("score", None)
         return json_obj, score
 
@@ -154,7 +152,5 @@ class AAMathJudge:
         )
         json_obj = json.loads(response.message.content[0].text)
         score = json_obj["score"]
-        print("SCORE")
-        print(json_obj["score"])
         json_obj.pop("score", None)
         return json_obj, score
