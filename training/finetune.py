@@ -1,17 +1,20 @@
 import cohere
 from dotenv import dotenv_values
 from cohere.finetuning import Settings, FinetunedModel, BaseModel
+from pathlib import Path
 
-MODEL_NAME = "test-finetune-model"
+MODEL_NAME = "math-aa-generator-v2"
+training_path = Path("data/calculus/training.jsonl")
+eval_path = Path("data/calculus/eval.jsonl")
 
 
-config = dotenv_values(".env")
+config = dotenv_values(Path("../.env"))
 co = cohere.ClientV2(config.get("COHERE_KEY"))
 
 chat_dataset = co.datasets.create(
     name="chat-dataset-with-eval",
-    data=open("training.jsonl", "rb"),
-    eval_data=open("eval.jsonl", "rb"),
+    data=open(training_path, "rb"),
+    eval_data=open(eval_path, "rb"),
     type="chat-finetune-input",
 )
 result = co.wait(chat_dataset)
@@ -20,7 +23,7 @@ print(result)
 print("------------")
 create_response = co.finetuning.create_finetuned_model(
     request=FinetunedModel(
-        name="math-aa-generator-v1",
+        name=MODEL_NAME,
         settings=Settings(
             base_model=BaseModel(
                 base_type="BASE_TYPE_CHAT",
