@@ -10,8 +10,8 @@ import judge
 
 class CSGenerator:
     def __init__(self):
-        # math_aa_generator_v2 = "e89238d1-6894-48a0-944c-011fd837df78-ft"
-        # self.model_id = math_aa_generator_v2
+        cs_generator_v1 = "a3c85146-0259-48c3-a7c0-e1ac0824a733-ft"
+        self.model_id = cs_generator_v1
         self.base_model_id = "command-a-03-2025"
 
         config = dotenv_values(".env")
@@ -19,11 +19,11 @@ class CSGenerator:
         self.KEY_LIMIT = 10
 
         self.Formatter = formatter.CSFormatter(self.co, self.base_model_id)
-        # self.Judge = judge.AAMathJudge(self.co, self.base_model_id)
+        self.Judge = judge.CSJudge(self.co, self.base_model_id)
 
     def generate_question(self, topic="Problem-solving and Programming"):
         response = self.co.chat(
-            model=self.base_model_id,
+            model=self.model_id,
             messages=[
                 {
                     "role": "system",
@@ -72,32 +72,23 @@ class CSGenerator:
     def generate(
         self, topic="Problem-solving and Programming", max_iterations=2, acceptable_score=95
     ):
-        print("Generating")
+        print("Generating...")
         question_str = self.generate_question(topic)
-        print("Formatting")
         question = self.Formatter.fix_json(question_str, topic)
-        print(f"Initial '{topic}' question generated")
-        print("------------")
-        print(question)
-        print("------------\n\n\n")
 
-        # for _ in range(max_iterations):
-        #     question, score = self.Judge.judge_question(question)
+        print(f"Judging question...")
+        for _ in range(max_iterations):
+            question, score = self.Judge.judge_question(question)
 
-        #     if score >= acceptable_score:
-        #         break
+            if score >= acceptable_score:
+                break
 
-        # print("Question finalized")
-        # print("------------")
-        # print(question)
-        # print("------------\n\n\n")
+        print(f"Judging markscheme...")
+        for _ in range(max_iterations):
+            question, score = self.Judge.judge_markscheme(question)
 
-        # for _ in range(max_iterations):
-        #     question, score = self.Judge.judge_markscheme(question)
+            if score >= acceptable_score:
+                break
 
-        #     if score >= acceptable_score:
-        #         break
-
-        # print("Markscheme finalized")
-
+        print("Question finalized")
         return self.Formatter.finalize_json(question)
