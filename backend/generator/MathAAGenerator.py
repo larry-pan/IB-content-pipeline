@@ -5,12 +5,12 @@ import judge
 
 
 class MathAAGenerator:
-    def __init__(self):
+    def __init__(self, env_path=".env"):
         math_aa_generator_v2 = "e89238d1-6894-48a0-944c-011fd837df78-ft"
         self.model_id = math_aa_generator_v2
         self.base_model_id = "command-a-03-2025"
 
-        config = dotenv_values(".env")
+        config = dotenv_values(env_path)
         self.co = cohere.ClientV2(config.get("COHERE_KEY"), log_warning_experimental_features=False)
         self.KEY_LIMIT = 10
 

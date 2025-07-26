@@ -1,7 +1,8 @@
 @echo off
 setlocal enabledelayedexpansion
 
-:: Set paths
+REM "Builds demo.exe"
+
 set FRONTEND_DIR=frontend
 set BACKEND_DIR=backend
 set STATIC_DIR=%BACKEND_DIR%\static
@@ -37,7 +38,7 @@ if errorlevel 1 (
     exit /b 1
 )
 cd /d %BACKEND_DIR%
-pyinstaller --noconfirm --onefile --add-data "static;static" --name %EXE_NAME% %MAIN_SCRIPT%
+pyinstaller --noconfirm --onefile --add-data "static;static" --add-data ".env;." --name %EXE_NAME% %MAIN_SCRIPT%
 if errorlevel 1 (
     echo backend bundle failed.
     exit /b 1

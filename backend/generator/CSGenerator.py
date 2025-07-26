@@ -5,12 +5,12 @@ import judge
 
 
 class CSGenerator:
-    def __init__(self):
+    def __init__(self, env_path=".env"):
         cs_generator_v1 = "a3c85146-0259-48c3-a7c0-e1ac0824a733-ft"
         self.model_id = cs_generator_v1
         self.base_model_id = "command-a-03-2025"
 
-        config = dotenv_values(".env")
+        config = dotenv_values(env_path)
         self.co = cohere.ClientV2(config.get("COHERE_KEY"), log_warning_experimental_features=False)
         self.KEY_LIMIT = 10
 
